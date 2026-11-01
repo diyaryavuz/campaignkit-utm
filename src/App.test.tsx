@@ -49,7 +49,7 @@ it('does not claim success when the browser rejects storage writes',async()=>{
   vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('QuotaExceeded');});
   await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
   await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
-  expect(screen.getByText(/Kaydedilemedi/)).toBeInTheDocument();
+  expect(screen.getByText(/Kayıt başarısız/)).toBeInTheDocument();
   expect(screen.getByRole('button',{name:'Kampanya kütüphanesi 00'})).toBeInTheDocument();
 });
 it('rejects malformed imports without losing existing records',async()=>{
@@ -73,7 +73,7 @@ it('preserves links saved while an imported file is still being read',async()=>{
   const file=new File(['pending'],'backup.json',{type:'application/json'});
   Object.defineProperty(file,'text',{value:()=>pending});
   fireEvent.change(screen.getByLabelText('JSON yedeği seç'),{target:{files:[file]}});
-  await user.click(screen.getByRole('button',{name:'Bağlantı oluştur 01'}));
+  await user.click(screen.getByRole('button',{name:'Bağlantı oluşturucu 01'}));
   await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
   await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
   await act(async()=>finishRead(backup([createRecord({...emptyCampaign,url:'https://example.com',source:'newsletter',medium:'email',campaign:'imported'})])));
