@@ -6,8 +6,60 @@ import '@testing-library/jest-dom/vitest';
 import App from './App';
 import { backup, createRecord, STORAGE_KEY } from './lib/library';
 import { emptyCampaign } from './lib/campaign';
+import { TEMPLATE_KEY } from './lib/templates';
 beforeEach(()=>localStorage.clear());
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
+
+it('persists and explicitly applies a naming template while preserving the destination', async()=>{
+  const user=userEvent.setup(); const app=render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
+  await user.type(screen.getByRole('textbox',{name:'Şablon adı'}),'Instagram story');
+  await user.click(screen.getByRole('button',{name:'Şablonu kaydet'}));
+  app.unmount(); render(<App/>);
+  fireEvent.change(screen.getByRole('textbox',{name:'Hedef adres'}),{target:{value:'https://example.com/new?ref=keep#section'}});
+  fireEvent.change(screen.getByRole('textbox',{name:'Anahtar kelime'}),{target:{value:'old'}});
+  await user.selectOptions(screen.getByRole('combobox',{name:'Kayıtlı şablon'}),'Instagram story');
+  expect(screen.getByRole('textbox',{name:'Kaynak'})).toHaveValue('');
+  await user.click(screen.getByRole('button',{name:'Şablonu uygula'}));
+  expect(screen.getByRole('textbox',{name:'Kaynak'})).toHaveValue('instagram');
+  expect(screen.getByRole('textbox',{name:'Anahtar kelime'})).toHaveValue('');
+  expect(screen.getByRole('textbox',{name:'Hedef adres'})).toHaveValue('https://example.com/new?ref=keep#section');
+  await user.click(screen.getByRole('button',{name:'Switch to English'}));
+  vi.spyOn(window,'confirm').mockReturnValue(false);
+  await user.click(screen.getByRole('button',{name:'Delete template'}));
+  expect(screen.getByRole('option',{name:'Instagram story'})).toBeInTheDocument();
+  vi.mocked(window.confirm).mockReturnValue(true);
+  await user.click(screen.getByRole('button',{name:'Delete template'}));
+  expect(screen.queryByRole('option',{name:'Instagram story'})).not.toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem(TEMPLATE_KEY)!).templates).toHaveLength(0);
+});
+
+it('preserves unreadable templates and only resets them after explicit confirmation', async()=>{
+  localStorage.setItem(TEMPLATE_KEY,'{broken');
+  const user=userEvent.setup();render(<App/>);
+  expect(screen.getByRole('alert')).toHaveTextContent('Şablonlar okunamadı');
+  expect(screen.queryByRole('button',{name:'Şablonu kaydet'})).not.toBeInTheDocument();
+  expect(localStorage.getItem(TEMPLATE_KEY)).toBe('{broken');
+  expect(screen.getByRole('button',{name:'Kütüphaneye kaydet'})).toBeEnabled();
+  vi.spyOn(window,'confirm').mockReturnValue(true);
+  await user.click(screen.getByRole('button',{name:'Şablonları sıfırla'}));
+  expect(screen.getByRole('button',{name:'Şablonu kaydet'})).toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem(TEMPLATE_KEY)!).templates).toEqual([]);
+});
+
+it('retains a template in memory and storage when deletion cannot be persisted', async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
+  await user.type(screen.getByRole('textbox',{name:'Şablon adı'}),'Keep me');
+  await user.click(screen.getByRole('button',{name:'Şablonu kaydet'}));
+  const before=localStorage.getItem(TEMPLATE_KEY);
+  vi.spyOn(window,'confirm').mockReturnValue(true);
+  vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('QuotaExceeded');});
+  await user.click(screen.getByRole('button',{name:'Şablonu sil'}));
+  expect(screen.getByText(/Şablon kaydedilemedi/)).toBeInTheDocument();
+  expect(screen.getByRole('option',{name:'Keep me'})).toBeInTheDocument();
+  expect(localStorage.getItem(TEMPLATE_KEY)).toBe(before);
+});
 
 it('blocks incomplete input and persists a valid link without duplicates', async()=>{
   const user=userEvent.setup(); const app=render(<App/>);

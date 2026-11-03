@@ -13,7 +13,7 @@ Prioritize based on reproduced user needs and review capacity:
 1. Accessibility and browser workflow coverage, especially import failures and keyboard use.
 2. Discoverability, clearer examples and translation consistency.
 3. Optional `utm_id` / `utm_source_platform` support after agreeing on backup compatibility.
-4. Reusable naming conventions after defining explicit normalization and persistence behavior.
+4. Validation rules for custom naming conventions. Reusable UTM value templates now support explicit application, exact-value preservation and separate browser storage.
 
 These are proposals, not promised delivery dates. Larger changes start with an issue and a design sketch. Do not add accounts, tracking, cloud sync or AI API dependencies to the first release.
 

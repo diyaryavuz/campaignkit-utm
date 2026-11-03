@@ -53,6 +53,12 @@ Veriler sunucuya gönderilmez; hedef URL'ye istek yapılmaz. Kayıtlar aynı ori
 
 GitHub Pages yayınında testlerin ve derlemenin başarılı olması gerekir. Kaynak koduna yapılan her `main` push'u demoyu yeniden yayımlar. Yerel önizleme ve canlı demo farklı origin olduğu için kayıtlarını paylaşmaz.
 
+## İsimlendirme şablonları
+
+Tek bağlantı oluşturucuda en az bir UTM alanı ve benzersiz bir şablon adı girip **Şablonu kaydet** düğmesini kullanın. Kayıtlı bir şablonu seçmek formu değiştirmez; **Şablonu uygula** beş UTM alanını boş değerler dahil değiştirir, hedef adresi korur. Değerler olduğu gibi saklanır; normalleştirme yalnızca açıkça istediğinizde yapılır.
+
+En fazla 20 şablon bu tarayıcıda saklanır. Şablon adları en fazla 60, UTM alanları 200 karakterdir. Silme onay ister; başarısız kayıtlar mevcut şablonları değiştirmez. Okunamayan veri korunur, indirilebilir ve açık onayla sıfırlanabilir. Şablonlar bağlantı kütüphanesinden ayrıdır; **kütüphanenin JSON yedeğine dahil değildir**. Tarayıcı verilerini temizlemek şablonları silebilir.
+
 ## Lisans
 
 CampaignKit kaynak kodu [MIT Lisansı](LICENSE) ile açık kaynaklıdır. Üçüncü taraf bağımlılıklar kendi lisanslarını korur.

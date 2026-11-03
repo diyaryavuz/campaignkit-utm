@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Save, apply and delete up to 20 browser-local UTM naming templates in English or Turkish. Applying preserves the destination URL; failed writes and unreadable template storage preserve existing data. Templates are separate from library JSON backups.
+
 - Community contribution guide, issue/PR templates, starter tasks and a documented v0.1 scope.
 
 ## 0.1.0 â€” first release candidate
