@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>CampaignKit</title>
+  <rect width="64" height="64" rx="14" fill="#153b30" />
+  <g fill="none" stroke="#e0ee94" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m16 24 16-8 16 8-16 8Z" />
+    <path d="m16 32 16 8 16-8M16 40l16 8 16-8" />
+  </g>
+</svg>
