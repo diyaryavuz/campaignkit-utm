@@ -10,6 +10,39 @@ import { TEMPLATE_KEY } from './lib/templates';
 beforeEach(()=>localStorage.clear());
 afterEach(()=>{cleanup();vi.restoreAllMocks();});
 
+it.each(['tr','en'] as const)('focuses the destination when reusing a saved link with the keyboard (%s)',async lang=>{
+  const user=userEvent.setup();
+  const campaign={...emptyCampaign,url:'https://example.com/campaign?ref=library',source:'newsletter',medium:'email',campaign:'keyboard_reuse'};
+  localStorage.setItem(STORAGE_KEY,backup([createRecord(campaign)]));
+  render(<App/>);
+  if(lang==='en')await user.click(screen.getByRole('button',{name:'Switch to English'}));
+  await user.click(screen.getByRole('button',{name:lang==='tr'?'Kampanya kütüphanesi 01':'Campaign library 01'}));
+  screen.getByRole('button',{name:lang==='tr'?'Yeniden kullan':'Reuse'}).focus();
+  await user.keyboard('{Enter}');
+  const destination=screen.getByRole('textbox',{name:lang==='tr'?'Hedef adres':'Destination URL'});
+  expect(destination).toHaveFocus();
+  expect(destination).toHaveValue(campaign.url);
+  await user.tab();
+  expect(screen.getByRole('textbox',{name:lang==='tr'?'Kaynak':'Source'})).toHaveFocus();
+  expect(screen.getByRole('textbox',{name:lang==='tr'?'Kampanya adı':'Campaign name'})).toHaveValue(campaign.campaign);
+});
+
+it('focuses the destination when starting from an empty library',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Kampanya kütüphanesi 00'}));
+  screen.getByRole('button',{name:'Bağlantı oluştur'}).focus();
+  await user.keyboard('{Enter}');
+  expect(screen.getByRole('textbox',{name:'Hedef adres'})).toHaveFocus();
+});
+
+it('keeps focus on the sidebar when navigating back to the builder',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Toplu bağlantılar 02'}));
+  const builder=screen.getByRole('button',{name:'Bağlantı oluşturucu 01'});
+  await user.click(builder);
+  expect(builder).toHaveFocus();
+});
+
 it('persists and explicitly applies a naming template while preserving the destination', async()=>{
   const user=userEvent.setup(); const app=render(<App/>);
   await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
