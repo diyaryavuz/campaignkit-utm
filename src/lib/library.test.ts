@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { backup, createRecord, csv, mergeRecords, parseBackup } from './library';
+import { backup, createRecord, csv, isStrictCreatedAt, mergeRecords, parseBackup } from './library';
 import { emptyCampaign } from './campaign';
 const campaign = { ...emptyCampaign, url: 'https://example.com', source: 'instagram', medium: 'paid_social', campaign: 'autumn' };
 describe('local campaign library', () => {
@@ -64,4 +64,9 @@ it('preserves stable library IDs across reloads and repairs duplicate imported I
   const parsed = parseBackup(backup([first,second]));
   expect(parsed[0].id).toBe(first.id);
   expect(parsed[1].id).not.toBe(first.id);
+});
+
+it('rejects normalized midnight and incomplete backup timestamps', () => {
+  for (const value of ['2026-11-08T24:00:00Z','2026-11-08T12:00Z','2026-11-08T12:00:00','2026-11-08T12:60:00Z']) expect(isStrictCreatedAt(value)).toBe(false);
+  expect(isStrictCreatedAt('2026-11-08T12:00:00.123+03:00')).toBe(true);
 });
