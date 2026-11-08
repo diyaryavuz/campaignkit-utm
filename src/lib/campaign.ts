@@ -7,6 +7,7 @@ export function validate(input: Campaign): { errors: Issue[]; warnings: Issue[] 
   const errors: Issue[] = [], warnings: Issue[] = [];
   if (!input.url.trim()) errors.push({ field: 'url', code: 'required' });
   else {
+    if (/[\u0000-\u001f\u007f]/.test(input.url)) errors.push({ field: 'url', code: 'url' });
     try {
       const url = new URL(input.url.trim());
       if (!['https:', 'http:'].includes(url.protocol)) errors.push({ field: 'url', code: 'url' });

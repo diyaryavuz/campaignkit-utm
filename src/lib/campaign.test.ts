@@ -38,3 +38,8 @@ describe('campaign links', () => {
     expect(() => buildVariants(sample, [])).toThrow();
   });
 });
+
+it('rejects hidden control characters instead of silently stripping them from URLs', () => {
+  for (const url of ['https://exa\tmple.com', 'https://example.com/a\nb', 'https://example.com/\u0000']) expect(() => buildLink({...sample,url})).toThrow('INVALID_CAMPAIGN');
+  expect(new URL(buildLink({...sample,url:'https://example.com/a%0Ab'})).pathname).toBe('/a%0Ab');
+});
