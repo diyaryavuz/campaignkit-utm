@@ -47,11 +47,13 @@ npm run preview
 
 ## Verification
 
-Automated tests cover URL encoding, unsafe URLs, credentials, preserved parameters, bulk validation, backup round-trips, malformed imports, duplicate handling, CSV escaping, persistence, blocked storage, language switching and naming-template workflows. The build includes TypeScript checks. Browser checks cover local persistence after reload and bulk saving. The mobile layout was checked at 375px with no horizontal document overflow.
+47 automated tests cover URL validation, bulk workflows, backups, duplicate handling, CSV escaping, storage failures, stale-tab protection, templates, keyboard focus and language preferences. The build includes TypeScript checks. Browser checks cover template backup/import, filtered CSV contents, language reload and bulk validation focus. Both languages were checked at 375px with no horizontal document overflow.
 
 GitHub Actions tests and builds pull requests. On `main`, successful checks also deploy the static demo to GitHub Pages. Build output is `dist/`; Vite uses a relative asset base for project-site hosting.
 
 ## Scope and privacy
+
+See the bilingual [backup and recovery guide](docs/BACKUP_AND_RECOVERY.md) before moving browsers or clearing site data. Link JSON backups and template JSON backups are separate. The library's CSV button exports all links; the search-results CSV button exports only matches. Template imports add entries and reject conflicting names without overwriting existing conventions.
 
 CampaignKit does **not** measure clicks, sales, conversions or ROAS. It does not connect to ad accounts or promise correct attribution. Analytics must already be configured on the destination site. Review the interaction of manual UTMs and automatic ad tagging in your own analytics setup.
 

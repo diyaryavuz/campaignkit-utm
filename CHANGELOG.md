@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Export and restore separate naming-template JSON backups, skipping identical entries and rejecting conflicting names.
+- Export matching library search results as CSV and clear searches while keeping keyboard focus.
+- Remember language across visits, with a session-only fallback when storage is unavailable.
+- Expose required/invalid fields to assistive technology, focus the first invalid field and describe errors beside bulk variants.
+- Preserve valid record IDs across reloads, repair duplicate imported IDs, deduplicate across query-key ordering and reject incomplete or normalized timestamps.
+- Reject URL control characters, warn on Unicode uppercase values and explicitly normalize decomposed Turkish characters consistently.
+- Synchronize the active record snapshot after recovery and block stale-tab writes when newer library data is detected.
+- Add a bilingual backup/recovery guide and verified mobile workflow screenshots.
+
 - Load the tab icon from the project path instead of requesting a missing root favicon on GitHub Pages.
 
 - Keep keyboard focus on the destination field when reusing a saved link or starting a link from an empty library.

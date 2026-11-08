@@ -38,12 +38,14 @@ npm run dev
 ```
 
 ```sh
-npm test       # 19 test: URL, veri koruma, içe aktarma ve arayüz akışları
+npm test       # 47 test: URL, veri koruma, şablonlar ve arayüz akışları
 npm run build # TypeScript kontrolü ve üretim derlemesi
 npm run preview
 ```
 
 ## Gerçek sınırlar
+
+Tarayıcı değiştirmeden veya verileri temizlemeden önce [yedekleme ve kurtarma rehberini](docs/BACKUP_AND_RECOVERY.md) okuyun. Bağlantı ve şablon JSON yedekleri ayrıdır. **CSV** tüm kayıtları, **Sonuçları CSV indir** yalnızca arama eşleşmelerini indirir. Şablon içe aktarma mevcut değerleri ezmez; aynı adda farklı değerler varsa işlemi reddeder.
 
 Bu uygulama tıklama, dönüşüm, satış veya ROAS ölçmez. Meta/Google Ads hesaplarına bağlanmaz; API anahtarı veya giriş gerektirmez. UTM alanları tek başına ölçüm sistemi değildir: hedef sitenizde uygun analiz kurulumu gerekir. Otomatik etiketleme ile elle UTM kullanımının etkisini kendi analiz kurulumunuzda kontrol edin.
 
