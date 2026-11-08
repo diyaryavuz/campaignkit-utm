@@ -172,3 +172,13 @@ it('remembers the workspace language after remounting', async()=>{
   await user.click(screen.getByRole('button',{name:'Switch to English'}));app.unmount();render(<App/>);
   expect(screen.getByRole('textbox',{name:'Destination URL'})).toBeInTheDocument();
 });
+
+it('exposes required fields and validation errors to assistive technology',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  const source=screen.getByRole('textbox',{name:'Kaynak'});
+  expect(source).toBeRequired();expect(source).not.toBeInvalid();
+  expect(screen.getByRole('textbox',{name:'Anahtar kelime'})).not.toBeRequired();
+  await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
+  expect(source).toBeInvalid();
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));expect(source).not.toBeInvalid();
+});
