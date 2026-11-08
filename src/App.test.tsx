@@ -193,3 +193,13 @@ it('focuses the first invalid field in single and bulk forms',async()=>{
   await user.click(screen.getByRole('button',{name:'Tümünü kaydet'}));
   expect(screen.getByRole('textbox',{name:'Kaynak 2'})).toHaveFocus();
 });
+
+it('can save after explicitly recovering a corrupt library',async()=>{
+  localStorage.setItem(STORAGE_KEY,'{broken');
+  const user=userEvent.setup();render(<App/>);vi.spyOn(window,'confirm').mockReturnValue(true);
+  await user.click(screen.getByRole('button',{name:'Kütüphaneyi sıfırla'}));
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
+  await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
+  expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).records).toHaveLength(1);
+});
