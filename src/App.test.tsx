@@ -235,3 +235,12 @@ it('clears an unsuccessful library search and returns focus to search',async()=>
   expect(search).toHaveValue('');expect(search).toHaveFocus();
   expect(screen.getByRole('heading',{name:'sonbahar_2026'})).toBeInTheDocument();
 });
+
+it('describes errors at the affected bulk variant',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Toplu bağlantılar 02'}));await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
+  const source=screen.getByRole('textbox',{name:'Kaynak 2'});await user.clear(source);
+  await user.click(screen.getByRole('button',{name:'Tümünü kaydet'}));
+  expect(source).toHaveAccessibleDescription(/Varyant 2: Kaynak/);
+  expect(screen.getByRole('textbox',{name:'Kaynak 1'})).not.toHaveAttribute('aria-describedby');
+});
