@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
 import { emptyCampaign } from './campaign';
-import { addTemplate, parseTemplates, serializeTemplates, TEMPLATE_LIMIT } from './templates';
+import { addTemplate, mergeTemplates, parseTemplates, serializeTemplates, TEMPLATE_LIMIT } from './templates';
 
 it('round-trips exact UTM values without saving the destination', () => {
   const templates = addTemplate([], '  Newsletter  ', { ...emptyCampaign, url: 'https://example.com/private', source: 'Email Team', medium: 'email' });
@@ -23,4 +23,13 @@ it('rejects malformed or unsupported stored data', () => {
   for (const raw of ['{broken', '{"version":2,"templates":[]}', '{"version":1,"templates":[{"name":"bad","values":{}}]}', 'x'.repeat(100_001)]) {
     expect(() => parseTemplates(raw)).toThrow();
   }
+});
+
+it('merges template backups additively and rejects conflicting names as a whole',()=>{
+  const existing=addTemplate([],'Weekly',{...emptyCampaign,source:'newsletter'});
+  expect(mergeTemplates(existing,existing)).toEqual(existing);
+  const added=addTemplate([],'Social',{...emptyCampaign,source:'instagram'});
+  expect(mergeTemplates(existing,added)).toHaveLength(2);
+  expect(()=>mergeTemplates(existing,addTemplate([],'weekly',{...emptyCampaign,source:'other'}))).toThrow('TEMPLATE_CONFLICT');
+  expect(existing).toHaveLength(1);
 });

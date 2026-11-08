@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Campaign } from './lib/campaign';
-import { addTemplate, loadTemplates, persistTemplates, serializeTemplates, TEMPLATE_LIMIT, type Template } from './lib/templates';
+import { addTemplate, loadTemplates, persistTemplates, parseTemplates, mergeTemplates, serializeTemplates, TEMPLATE_LIMIT, type Template } from './lib/templates';
 
 type Props = {
   lang: 'tr' | 'en';
@@ -17,11 +17,14 @@ export default function Templates({ lang, campaign, onApply, onNotice, onDownloa
   const [blocked, setBlocked] = useState(initial.error);
   const [name, setName] = useState('');
   const [selected, setSelected] = useState('');
+  const templatesRef = useRef(initial.templates);
+  const fileInput = useRef<HTMLInputElement>(null);
   const current = templates.find(template => template.name === selected);
 
   function store(next: Template[]): boolean {
     try {
       persistTemplates(next);
+      templatesRef.current = next;
       setTemplates(next);
       return true;
     } catch {
@@ -30,6 +33,13 @@ export default function Templates({ lang, campaign, onApply, onNotice, onDownloa
     }
   }
 
+  async function importFile(file: File) {
+    try {
+      if (file.size > 100_000) throw new Error('FILE_TOO_LARGE');
+      const incoming = parseTemplates(await file.text());
+      if (store(mergeTemplates(templatesRef.current, incoming))) onNotice(l('Şablonlar içe aktarıldı. Aynı şablonlar atlandı.', 'Templates imported. Identical templates skipped.'));
+    } catch { onNotice(l('Şablon yedeği geçersiz, çok büyük veya mevcut adlarla çakışıyor. Şablonlar değiştirilmedi.', 'Template backup is invalid, oversized or conflicts with existing names. Templates are unchanged.')); }
+  }
   return <section className="templates" aria-labelledby="templates-heading">
     <h3 id="templates-heading">{l('İsimlendirme şablonları', 'Naming templates')}</h3>
     <p className="field-hint">{l('UTM alanlarını olduğu gibi saklayın. Uygulama, boş değerler dahil UTM alanlarını değiştirir; hedef adres korunur. En fazla 20 şablon.', 'Save UTM fields exactly as entered. Applying replaces UTM fields, including blanks; the destination stays unchanged. Up to 20 templates.')}</p>
@@ -43,7 +53,10 @@ export default function Templates({ lang, campaign, onApply, onNotice, onDownloa
         }
       }}>{l('Şablonları sıfırla', 'Reset templates')}</button>
     </div> : <>
-      <button type="button" className="secondary" disabled={!templates.length} onClick={() => onDownload(serializeTemplates(templates), 'campaignkit-templates.json', 'application/json')}>{l('Şablonları yedekle', 'Back up templates')}</button>
+      <button type="button" className="secondary" disabled={!templates.length} onClick={() => onDownload(serializeTemplates(templates), 'campaignkit-templates.json', 'application/json')}>{l('Şablonları yedekle', 'Back up templates')}</button>{' '}
+      <button type="button" className="secondary" onClick={() => fileInput.current?.click()}>{l('Şablonları içe aktar', 'Import templates')}</button>
+      <input ref={fileInput} className="visually-hidden" type="file" accept=".json,application/json" aria-label={l('Şablon yedeği seç', 'Choose template backup')} onChange={event => { const file = event.target.files?.[0]; if(file) void importFile(file); event.target.value=''; }}/>
+
       <div className="template-controls">
         <label className="field"><span>{l('Şablon adı', 'Template name')}</span><input value={name} onChange={event => setName(event.target.value)} maxLength={60}/></label>
         <button type="button" className="secondary" disabled={templates.length >= TEMPLATE_LIMIT} onClick={() => {

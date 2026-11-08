@@ -44,3 +44,15 @@ export function loadTemplates(): { templates: Template[]; error: boolean; raw: s
 export function persistTemplates(templates: Template[]): void {
   localStorage.setItem(TEMPLATE_KEY, serializeTemplates(templates));
 }
+
+/** Merge backups without silently replacing an existing naming convention. */
+export function mergeTemplates(existing: Template[], incoming: Template[]): Template[] {
+  const next = [...existing];
+  for (const item of incoming) {
+    const previous = next.find(template => template.name.toLowerCase() === item.name.toLowerCase());
+    if (previous) {
+      if (fields.some(field => previous.values[field] !== item.values[field])) throw new Error('TEMPLATE_CONFLICT');
+    } else next.push(item);
+  }
+  return parseTemplates(serializeTemplates(next));
+}
