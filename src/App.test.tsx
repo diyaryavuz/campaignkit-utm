@@ -203,3 +203,14 @@ it('can save after explicitly recovering a corrupt library',async()=>{
   await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
   expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).records).toHaveLength(1);
 });
+
+it('does not overwrite library changes made by another tab',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  const external=backup([createRecord({...emptyCampaign,url:'https://example.com/other',source:'other',medium:'email',campaign:'other_tab'})]);
+  localStorage.setItem(STORAGE_KEY,external);
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
+  await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
+  expect(screen.getByText(/Kütüphane başka bir sekmede değişti/)).toBeInTheDocument();
+  expect(localStorage.getItem(STORAGE_KEY)).toBe(external);
+  expect(screen.getByRole('button',{name:'Kampanya kütüphanesi 00'})).toBeInTheDocument();
+});
