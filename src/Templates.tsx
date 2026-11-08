@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Campaign } from './lib/campaign';
-import { addTemplate, loadTemplates, persistTemplates, TEMPLATE_LIMIT, type Template } from './lib/templates';
+import { addTemplate, loadTemplates, persistTemplates, serializeTemplates, TEMPLATE_LIMIT, type Template } from './lib/templates';
 
 type Props = {
   lang: 'tr' | 'en';
@@ -43,6 +43,7 @@ export default function Templates({ lang, campaign, onApply, onNotice, onDownloa
         }
       }}>{l('Şablonları sıfırla', 'Reset templates')}</button>
     </div> : <>
+      <button type="button" className="secondary" disabled={!templates.length} onClick={() => onDownload(serializeTemplates(templates), 'campaignkit-templates.json', 'application/json')}>{l('Şablonları yedekle', 'Back up templates')}</button>
       <div className="template-controls">
         <label className="field"><span>{l('Şablon adı', 'Template name')}</span><input value={name} onChange={event => setName(event.target.value)} maxLength={60}/></label>
         <button type="button" className="secondary" disabled={templates.length >= TEMPLATE_LIMIT} onClick={() => {
