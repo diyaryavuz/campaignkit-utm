@@ -37,7 +37,7 @@ export function buildLink(input: Campaign): string {
 }
 // Only called by an explicit user action; campaign names are never silently changed.
 export function normalizeValue(value: string): string {
-  return value.trim().toLocaleLowerCase('tr-TR').replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/\s+/g, '_');
+  return value.normalize('NFC').trim().toLocaleLowerCase('tr-TR').replace(/ı/g, 'i').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/\s+/g, '_');
 }
 export type Variant = { id: string; source: string; medium: string; content: string };
 export function buildVariants(input: Campaign, variants: Variant[]) {

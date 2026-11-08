@@ -48,3 +48,8 @@ it('warns about uppercase characters beyond the Latin and Turkish alphabets', ()
   for (const campaign of ['Été','Αθήνα','Кампания']) expect(validate({...sample,campaign}).warnings).toContainEqual({field:'campaign',code:'case'});
   expect(validate({...sample,campaign:'été'}).warnings).not.toContainEqual({field:'campaign',code:'case'});
 });
+
+it('normalizes decomposed Turkish characters consistently on explicit request', () => {
+  expect(normalizeValue('I\u0307LK G\u0306U\u0308N')).toBe(normalizeValue('İLK GÜN'));
+  expect(new URL(buildLink({...sample,campaign:'G\u0306U\u0308N'})).searchParams.get('utm_campaign')).toBe('G\u0306U\u0308N');
+});
