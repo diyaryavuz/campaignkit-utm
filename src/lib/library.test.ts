@@ -56,3 +56,12 @@ describe('local campaign library', () => {
     expect(payload('2024-06-01T10:30:00-05:00').createdAt).toBe('2024-06-01T15:30:00.000Z');
   });
 });
+
+it('preserves stable library IDs across reloads and repairs duplicate imported IDs', () => {
+  const first = createRecord(campaign), second = createRecord({...campaign, content:'second'});
+  expect(parseBackup(backup([first]))[0].id).toBe(first.id);
+  second.id = first.id;
+  const parsed = parseBackup(backup([first,second]));
+  expect(parsed[0].id).toBe(first.id);
+  expect(parsed[1].id).not.toBe(first.id);
+});

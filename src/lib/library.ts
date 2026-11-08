@@ -32,12 +32,15 @@ export function parseBackup(text: string): SavedLink[] {
   if (text.length > 5_000_000) throw new Error('FILE_TOO_LARGE');
   const data: unknown = JSON.parse(text);
   if (!data || typeof data !== 'object' || !('version' in data) || data.version !== 1 || !('records' in data) || !Array.isArray(data.records) || data.records.length > LIMIT) throw new Error('INVALID_BACKUP');
+  const ids = new Set<string>();
   return mergeRecords([], data.records.map((row: unknown) => {
     if (!row || typeof row !== 'object' || !('campaign' in row) || !row.campaign || typeof row.campaign !== 'object') throw new Error('INVALID_RECORD');
     const source = row.campaign as Record<string, unknown>;
     if (['url', ...fields].some(key => typeof source[key] !== 'string')) throw new Error('INVALID_RECORD');
     const campaign = Object.fromEntries(['url', ...fields].map(key => [key, source[key]])) as Campaign;
     const item = createRecord(campaign); // Never trust a stored URL or HTML; regenerate from validated fields.
+    if ('id' in row && typeof row.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(row.id) && !ids.has(row.id.toLowerCase())) item.id = row.id;
+    ids.add(item.id.toLowerCase());
     if ('createdAt' in row && typeof row.createdAt === 'string' && isStrictCreatedAt(row.createdAt)) item.createdAt = new Date(row.createdAt).toISOString();
     return item;
   }));
