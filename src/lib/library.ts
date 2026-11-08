@@ -5,10 +5,15 @@ export type SavedLink = { id: string; createdAt: string; campaign: Campaign; lin
 export function createRecord(campaign: Campaign): SavedLink {
   return { id: crypto.randomUUID(), createdAt: new Date().toISOString(), campaign: { ...campaign }, link: buildLink(campaign) };
 }
+function linkKey(link: string): string {
+  const url = new URL(link);
+  url.searchParams.sort();
+  return url.href;
+}
 export function mergeRecords(existing: SavedLink[], incoming: SavedLink[]): SavedLink[] {
-  const links = new Set(existing.map(x => x.link));
+  const links = new Set(existing.map(x => linkKey(x.link)));
   const merged = [...existing];
-  for (const item of incoming) if (!links.has(item.link)) { links.add(item.link); merged.push(item); }
+  for (const item of incoming) if (!links.has(linkKey(item.link))) { links.add(linkKey(item.link)); merged.push(item); }
   if (merged.length > LIMIT) throw new Error('LIBRARY_LIMIT');
   return merged;
 }

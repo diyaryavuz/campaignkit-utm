@@ -25,7 +25,7 @@ describe('local campaign library', () => {
     const merged = mergeRecords([first], [createRecord(campaign), second]);
     expect(merged).toHaveLength(2);
     expect(merged[0]).toBe(first);
-    expect(() => mergeRecords(Array.from({length:500},(_,i)=>({...first,link:String(i)})),[second])).toThrow('LIBRARY_LIMIT');
+    expect(() => mergeRecords(Array.from({length:500},(_,i)=>({...first,link:'https://example.com/?id='+i})),[second])).toThrow('LIBRARY_LIMIT');
   });
   it('escapes CSV quotes and neutralizes formula prefixes', () => {
     const file = csv([createRecord({ ...campaign, campaign: '=1+1', content: 'a,"b"\nline' })]);
@@ -69,4 +69,12 @@ it('preserves stable library IDs across reloads and repairs duplicate imported I
 it('rejects normalized midnight and incomplete backup timestamps', () => {
   for (const value of ['2026-11-08T24:00:00Z','2026-11-08T12:00Z','2026-11-08T12:00:00','2026-11-08T12:60:00Z']) expect(isStrictCreatedAt(value)).toBe(false);
   expect(isStrictCreatedAt('2026-11-08T12:00:00.123+03:00')).toBe(true);
+});
+
+it('skips links differing only in query key order without rewriting the original', () => {
+  const first = createRecord({...campaign,url:'https://example.com/?b=2&a=1#keep'});
+  const reordered = createRecord({...campaign,url:'https://example.com/?a=1&b=2#keep'});
+  expect(mergeRecords([first],[reordered])).toEqual([first]);
+  const different = createRecord({...campaign,url:'https://example.com/?a=1&b=2#other'});
+  expect(mergeRecords([first],[different])).toHaveLength(2);
 });
