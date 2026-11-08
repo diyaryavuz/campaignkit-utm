@@ -182,3 +182,14 @@ it('exposes required fields and validation errors to assistive technology',async
   expect(source).toBeInvalid();
   await user.click(screen.getByRole('button',{name:'Örnek doldur'}));expect(source).not.toBeInvalid();
 });
+
+it('focuses the first invalid field in single and bulk forms',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
+  expect(screen.getByRole('textbox',{name:'Hedef adres'})).toHaveFocus();
+  await user.click(screen.getByRole('button',{name:'Toplu bağlantılar 02'}));
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));
+  await user.clear(screen.getByRole('textbox',{name:'Kaynak 2'}));
+  await user.click(screen.getByRole('button',{name:'Tümünü kaydet'}));
+  expect(screen.getByRole('textbox',{name:'Kaynak 2'})).toHaveFocus();
+});
