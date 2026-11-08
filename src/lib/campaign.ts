@@ -21,7 +21,7 @@ export function validate(input: Campaign): { errors: Issue[]; warnings: Issue[] 
     const value = input[field].trim();
     if (['source', 'medium', 'campaign'].includes(field) && !value) errors.push({ field, code: 'required' });
     if (value.length > 200) errors.push({ field, code: 'length' });
-    if (/[A-ZİĞÜŞÖÇ]/.test(value)) warnings.push({ field, code: 'case' });
+    if (/\p{Lu}/u.test(value)) warnings.push({ field, code: 'case' });
     if (/\s/.test(value)) warnings.push({ field, code: 'spaces' });
   }
   return { errors, warnings };

@@ -43,3 +43,8 @@ it('rejects hidden control characters instead of silently stripping them from UR
   for (const url of ['https://exa\tmple.com', 'https://example.com/a\nb', 'https://example.com/\u0000']) expect(() => buildLink({...sample,url})).toThrow('INVALID_CAMPAIGN');
   expect(new URL(buildLink({...sample,url:'https://example.com/a%0Ab'})).pathname).toBe('/a%0Ab');
 });
+
+it('warns about uppercase characters beyond the Latin and Turkish alphabets', () => {
+  for (const campaign of ['Été','Αθήνα','Кампания']) expect(validate({...sample,campaign}).warnings).toContainEqual({field:'campaign',code:'case'});
+  expect(validate({...sample,campaign:'été'}).warnings).not.toContainEqual({field:'campaign',code:'case'});
+});
