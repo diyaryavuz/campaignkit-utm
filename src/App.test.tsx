@@ -214,3 +214,14 @@ it('does not overwrite library changes made by another tab',async()=>{
   expect(localStorage.getItem(STORAGE_KEY)).toBe(external);
   expect(screen.getByRole('button',{name:'Kampanya kütüphanesi 00'})).toBeInTheDocument();
 });
+
+it('offers a separate CSV export for matching search results',async()=>{
+  localStorage.setItem(STORAGE_KEY,backup([createRecord({...emptyCampaign,url:'https://example.com',source:'email',medium:'email',campaign:'spring'}),createRecord({...emptyCampaign,url:'https://example.com',source:'social',medium:'social',campaign:'autumn'})]));
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Kampanya kütüphanesi 02'}));
+  expect(screen.queryByRole('button',{name:/Sonuçları CSV/})).not.toBeInTheDocument();
+  await user.type(screen.getByRole('textbox',{name:'Kütüphanede ara'}),'spring');
+  expect(screen.getByRole('button',{name:'Sonuçları CSV indir (1)'})).toBeEnabled();
+  await user.type(screen.getByRole('textbox',{name:'Kütüphanede ara'}),'absent');
+  expect(screen.getByRole('button',{name:'Sonuçları CSV indir (0)'})).toBeDisabled();
+});
