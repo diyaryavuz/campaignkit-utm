@@ -6,9 +6,11 @@ import Templates from './Templates';
 
 type View = 'builder' | 'bulk' | 'library';
 type Language = 'tr' | 'en';
+const LANGUAGE_KEY = 'campaignkit.language';
+function preferredLanguage(): Language { try { return localStorage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'tr'; } catch { return 'tr'; } }
 const newVariant = (): Variant => ({ id: crypto.randomUUID(), source: '', medium: '', content: '' });
 export default function App() {
-  const [lang, setLang] = useState<Language>('tr');
+  const [lang, setLang] = useState<Language>(preferredLanguage);
   const l = (tr: string, en: string) => lang === 'tr' ? tr : en;
   const [view, setView] = useState<View>('builder');
   const [input, setInput] = useState<Campaign>({ ...emptyCampaign });
@@ -23,7 +25,7 @@ export default function App() {
   const fileInput = useRef<HTMLInputElement>(null);
   const destinationInput = useRef<HTMLInputElement>(null);
   const pendingBuilderFocus = useRef(false);
-  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  useEffect(() => { document.documentElement.lang = lang; try { localStorage.setItem(LANGUAGE_KEY, lang); } catch { /* Language still works for this session. */ } }, [lang]);
   useEffect(() => {
     if (view === 'builder' && pendingBuilderFocus.current) {
       pendingBuilderFocus.current = false;

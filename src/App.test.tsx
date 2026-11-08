@@ -166,3 +166,9 @@ it('preserves links saved while an imported file is still being read',async()=>{
   const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)!).records;
   expect(saved.map((r:{campaign:{campaign:string}})=>r.campaign.campaign)).toEqual(['sonbahar_2026','imported']);
 });
+
+it('remembers the workspace language after remounting', async()=>{
+  const user=userEvent.setup();const app=render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Switch to English'}));app.unmount();render(<App/>);
+  expect(screen.getByRole('textbox',{name:'Destination URL'})).toBeInTheDocument();
+});
