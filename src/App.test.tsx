@@ -225,3 +225,13 @@ it('offers a separate CSV export for matching search results',async()=>{
   await user.type(screen.getByRole('textbox',{name:'Kütüphanede ara'}),'absent');
   expect(screen.getByRole('button',{name:'Sonuçları CSV indir (0)'})).toBeDisabled();
 });
+
+it('clears an unsuccessful library search and returns focus to search',async()=>{
+  const user=userEvent.setup();render(<App/>);
+  await user.click(screen.getByRole('button',{name:'Örnek doldur'}));await user.click(screen.getByRole('button',{name:'Kütüphaneye kaydet'}));
+  await user.click(screen.getByRole('button',{name:'Kampanya kütüphanesi 01'}));
+  const search=screen.getByRole('textbox',{name:'Kütüphanede ara'});await user.type(search,'missing');
+  await user.click(screen.getByRole('button',{name:'Aramayı temizle'}));
+  expect(search).toHaveValue('');expect(search).toHaveFocus();
+  expect(screen.getByRole('heading',{name:'sonbahar_2026'})).toBeInTheDocument();
+});
